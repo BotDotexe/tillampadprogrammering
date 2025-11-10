@@ -4,8 +4,8 @@
 * Author: Alexander Stupak
 * Date: 2025-11-10
 * Description: This project uses a ds3231 to measure time and displays the time to an 1306 oled display, 
-* Further, it measures temprature and displays a mapped value to a 9g-servo-motor
-* At the same time it utilizes a potentiometer to set a timer for an alarm.
+* Further, a potentiometer is utilized to get a countdown time, similar to a kitchen-alarmclock
+* aswell as displaying the time left until the alarm goes of.
 */
 
 // Include Libraries
