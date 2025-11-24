@@ -47,11 +47,8 @@ void setup()
 
 void loop()
 {
-  Height = mySensorB.readFloatPressure() - StartPressure;
-  Serial.println(Height/12);
-  
-  Serial.print("HumidityA: ");
-  Serial.print(mySensorA.readFloatHumidity(), 0);
+  Height = mySensorA.readFloatPressure() - StartPressure;
+  Serial.println(Height/MpPa);
 
   Serial.print(" PressureA: ");
   Serial.print(mySensorA.readFloatPressure(), 0);
