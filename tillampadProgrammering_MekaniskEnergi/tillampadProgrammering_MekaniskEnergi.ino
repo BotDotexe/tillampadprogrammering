@@ -29,14 +29,15 @@ Adafruit_MPU6050 mpu;
 
 //constant variables:
 const int button_pin= 8;
-const int ArraySize = 10;
-int filterArray[ArraySize];
-const float weight = 0.1 //Weight in kg
-const float gravconst = 9.82 //the gravitational constant approx. 9.82 
+const int ArrayLength = 10;
+int filterArray[ArrayLength] = { 0 };
+int currentIndex = 0;
+const float weight = 0.1; //Weight in kg
+const float gravconst = 9.82; //the gravitational constant approx. 9.82 
 //temp variables/dynamic variables:
 float start_height;
 float current_height;
-float potentialenergy;
+int potentialenergy;
 float heightPos;
 int index = 0;
 int i = 0;
@@ -45,7 +46,7 @@ int i = 0;
 //setup
 void setup() {
   mpu.begin();
-  Serial.begin(115200);
+  Serial.begin(9600);
   pinMode(OUTPUT, button_pin);
   while ( !Serial ) delay(100);   // wait for native usb
   Serial.println(F("BMP280 test"));
@@ -63,9 +64,10 @@ void loop() {
   if(digitalRead(button_pin) == LOW)
    { start_height = bmp.readAltitude(1013.25);
   }
-  
+
+
   heightPos = (current_height - start_height) * 100;
-  potentialenergy = weight * heightPos * gravconst
+  
 
     /*
     Serial.print(F("Temperature = "));
@@ -87,14 +89,14 @@ void loop() {
     
     Serial.print("Height:");
     Serial.print(filter(heightPos));
-    Serial.println(" cm");
+    Serial.print("cm");
     filter(heightPos);
 
     sensors_event_t a, g, temp;
     mpu.getEvent(&a, &g, &temp);
 
     delay(1000);
-    Serial.print("AccelX:");
+    Serial.print(" AccelX:");
     Serial.print(a.acceleration.x);
     Serial.print(",");
     Serial.print("AccelY:");
@@ -102,16 +104,7 @@ void loop() {
     Serial.print(",");
     Serial.print("AccelZ:");
     Serial.print(a.acceleration.z);
-    Serial.print(", ");
-    Serial.print("GyroX:");
-    Serial.print(g.gyro.x);
-    Serial.print(",");
-    Serial.print("GyroY:");
-    Serial.print(g.gyro.y);
-    Serial.print(",");
-    Serial.print("GyroZ:");
-    Serial.print(g.gyro.z);
-    Serial.println("");
+    Serial.println(" ");
 }
 
 
@@ -121,22 +114,25 @@ void loop() {
 // Parameters: nothing ||
 // Output: float ||
 float filter(float input) {
-  filterArray[index] = input;
-  index= (index + 1) % 10;
+  filterArray[currentIndex] = input;
   
-  float sum = 0.0;
-  float avg = 0.0;
-
-  for (int i = 0; i < 10; i++) {
-    sum += filterArray[i];
+   // Move to the next index in a circular manner
+  currentIndex = (currentIndex + 1) % ArrayLength;
+  
+  int sum = 0;
+  
+  for (int i = 0; i < ArrayLength; i++) {
+    sum = sum + filterArray[i];
   }
-  avg = sum / 10.0;
-  return avg;
-  delay(50);
-
-
+  return sum / ArrayLength;
 }
-
+// Potential energy fuction
+// Takes the height difference and uses it to give a rough value over the potential energy ||
+// Parameters: float || 
+// Output: integer ||
+int potentialEnergy(float input) {
+   return potentialenergy = weight * input * gravconst;
+}
 
 
 
