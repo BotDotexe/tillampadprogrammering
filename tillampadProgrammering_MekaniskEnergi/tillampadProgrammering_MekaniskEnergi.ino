@@ -28,6 +28,7 @@ Adafruit_BMP280 bmp;
 Adafruit_MPU6050 mpu;
 
 //constant variables:
+const float baudtime = 1/9600;
 const int button_pin= 8;
 const int ArrayLength = 10;
 int filterArray[ArrayLength] = { 0 };
@@ -39,8 +40,11 @@ float start_height;
 float current_height;
 int potentialenergy;
 float heightPos;
+int DynamicNRG;
 int index = 0;
 int i = 0;
+int TotEnergy;
+
 
 
 //setup
@@ -58,7 +62,7 @@ void setup() {
   }
 
 
- 
+//The main loop||
 void loop() {
   current_height = bmp.readAltitude(1013.25);
   if(digitalRead(button_pin) == LOW)
@@ -86,31 +90,49 @@ void loop() {
     delay(2000);
     
     */
-    
+    /*
     Serial.print("Height:");
     Serial.print(filter(heightPos));
     Serial.print("cm");
     filter(heightPos);
-
+    */
     sensors_event_t a, g, temp;
     mpu.getEvent(&a, &g, &temp);
 
     delay(1000);
+    /*
     Serial.print(" AccelX:");
     Serial.print(a.acceleration.x);
-    Serial.print(",");
+    Serial.print(", ");
     Serial.print("AccelY:");
     Serial.print(a.acceleration.y);
-    Serial.print(",");
+    Serial.print(", ");
     Serial.print("AccelZ:");
     Serial.print(a.acceleration.z);
-    Serial.println(" ");
+    Serial.print(" ");
+    */
+    DynamicNRG = dynamicEnergy(filter(a.acceleration.x));
+    potentialenergy = potentialEnergy(heightPos);
+    TotEnergy = DynamicNRG + potentialEnergy(heightPos);
+    Serial.print(DynamicNRG);
+    Serial.print(" ");
+    Serial.println("F ");
+    Serial.print("Total Energy = ");
+    Serial.println(TotEnergy);
+    
+    Serial.print("|Dynamic Energy: ");
+    Serial.print(DynamicNRG);
+    Serial.print(" F + ");
+    Serial.print("Potential Energy: ");
+    Serial.print(potentialenergy);
+    Serial.println(" F |");
+    Serial.println("_________________________________________________________________________________________");
 }
 
 
 
 // filter function
-// utilizes arrays to give a rounded value that has been read. ||
+// utilizes arrays to give a rounded value from values that has been read. ||
 // Parameters: nothing ||
 // Output: float ||
 float filter(float input) {
@@ -134,6 +156,11 @@ int potentialEnergy(float input) {
    return potentialenergy = weight * input * gravconst;
 }
 
+// Dynamic energy function ||
+// Uses the primary function 
+int dynamicEnergy(float input){
+  return (weight * input * input)/2; 
+}
 
 
 
