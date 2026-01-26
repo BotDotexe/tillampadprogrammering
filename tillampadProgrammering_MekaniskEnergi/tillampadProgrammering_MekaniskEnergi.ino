@@ -35,6 +35,7 @@ int filterArray[ArrayLength] = { 0 };
 int currentIndex = 0;
 const float weight = 0.1; //Weight in kg
 const float gravconst = 9.82; //the gravitational constant approx. 9.82 
+
 //temp variables/dynamic variables:
 float start_height;
 float current_height;
@@ -73,53 +74,22 @@ void loop() {
   heightPos = (current_height - start_height) * 100;
   
 
-    /*
-    Serial.print(F("Temperature = "));
-    Serial.print(bmp.readTemperature());
-    Serial.println(" *C");
 
-    Serial.print(F("Pressure = "));
-    Serial.print(bmp.readPressure());
-    Serial.println(" Pa");
-
-    Serial.print(F("Approx altitude = "));
-    Serial.print(bmp.readAltitude(1013.25)); 
-    Serial.println(" m");
-
-    Serial.println();
-    delay(2000);
-    
-    */
-    /*
-    Serial.print("Height:");
-    Serial.print(filter(heightPos));
-    Serial.print("cm");
-    filter(heightPos);
-    */
     sensors_event_t a, g, temp;
     mpu.getEvent(&a, &g, &temp);
 
     delay(1000);
-    /*
-    Serial.print(" AccelX:");
-    Serial.print(a.acceleration.x);
-    Serial.print(", ");
-    Serial.print("AccelY:");
-    Serial.print(a.acceleration.y);
-    Serial.print(", ");
-    Serial.print("AccelZ:");
-    Serial.print(a.acceleration.z);
-    Serial.print(" ");
-    */
+
     DynamicNRG = dynamicEnergy(filter(a.acceleration.x));
     potentialenergy = potentialEnergy(heightPos);
     TotEnergy = DynamicNRG + potentialEnergy(heightPos);
+
+
     Serial.print(DynamicNRG);
     Serial.print(" ");
     Serial.println("F ");
     Serial.print("Total Energy = ");
     Serial.println(TotEnergy);
-    
     Serial.print("|Dynamic Energy: ");
     Serial.print(DynamicNRG);
     Serial.print(" F + ");
@@ -131,10 +101,10 @@ void loop() {
 
 
 
-// filter function
-// utilizes arrays to give a rounded value from values that has been read. ||
-// Parameters: nothing ||
-// Output: float ||
+// Filter function ||
+// utilizes arrays to give an average value based from the input values ||
+// Parameters: Input - a float ||
+// Output: Integer - Returns an average value as integer||
 float filter(float input) {
   filterArray[currentIndex] = input;
   
@@ -148,16 +118,19 @@ float filter(float input) {
   }
   return sum / ArrayLength;
 }
-// Potential energy fuction
+
+// Potential energy fuction ||
 // Takes the height difference and uses it to give a rough value over the potential energy ||
-// Parameters: float || 
-// Output: integer ||
+// Parameters: input - height above zero level as float ||
+// Output: potential energy returned as an integer ||
 int potentialEnergy(float input) {
    return potentialenergy = weight * input * gravconst;
 }
 
 // Dynamic energy function ||
-// Uses the primary function 
+// Uses the formula for dynamic energy and velocity as input to calculate the dynmaic energy of our components ||
+// Parameter: Input - The velocity in one axis as a float ||
+// Output: Dynamic energy as an integer ||
 int dynamicEnergy(float input){
   return (weight * input * input)/2; 
 }
