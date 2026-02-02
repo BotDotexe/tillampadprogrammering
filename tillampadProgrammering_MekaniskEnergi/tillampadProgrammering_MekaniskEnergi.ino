@@ -32,7 +32,7 @@ const float baudtime = 1/9600;
 const int button_pin= 8;
 const int ArrayLength = 10;
 int filterArray[ArrayLength] = { 0 };
-int currentIndex = 0;
+
 const float weight = 0.1; //Weight in kg
 const float gravconst = 9.82; //the gravitational constant approx. 9.82 
 
@@ -41,11 +41,11 @@ float start_height;
 float current_height;
 int potentialenergy;
 float heightPos;
-int DynamicNRG;
+float DynamicNRG;
 int index = 0;
 int i = 0;
 int TotEnergy;
-
+int currentIndex = 0;
 
 
 //setup
@@ -69,7 +69,7 @@ void loop() {
   if(digitalRead(button_pin) == LOW)
    { start_height = bmp.readAltitude(1013.25);
   }
-
+  
 
   heightPos = (current_height - start_height) * 100;
   
@@ -80,7 +80,7 @@ void loop() {
 
     delay(1000);
 
-    DynamicNRG = dynamicEnergy(filter(a.acceleration.x));
+    DynamicNRG = dynamicEnergy(a.acceleration.x);
     potentialenergy = potentialEnergy(heightPos);
     TotEnergy = DynamicNRG + potentialEnergy(heightPos);
 
@@ -130,9 +130,9 @@ int potentialEnergy(float input) {
 // Dynamic energy function ||
 // Uses the formula for dynamic energy and velocity as input to calculate the dynmaic energy of our components ||
 // Parameter: Input - The velocity in one axis as a float ||
-// Output: Dynamic energy as an integer ||
+// Output: Dynamic energy as an float ||
 int dynamicEnergy(float input){
-  return (weight * input * input)/2; 
+  return (weight * (input*10 * input*10))/2.0; 
 }
 
 
