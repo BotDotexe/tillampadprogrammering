@@ -7,27 +7,32 @@
 
 
 // Constant Variables
-const int Buttonpin = 2;
-
+const int buttonPin = 2;
+const int piezoPin = 3;
 
 //Dynamic Variables
 int myTime;
 int prevTime;
 int nowTime;
+int i;
 void setup() {
   Serial.begin(9600);
-  pinMode(OUTPUT,Buttonpin);
+  pinMode(buttonPin, INPUT);
+  pinMode(piezoPin, OUTPUT);
   prevTime = millis()/1000;
 }
 
 void loop() {
   //Serial.println(digitalRead(Buttonpin)); 
-  while(digitalRead(Buttonpin) == 1){
+  while(digitalRead(buttonPin) == 1){
+    tone(piezoPin, 3000, 1);
     if(prevTime + 1 <= millis()/1000) { 
-      Serial.println(millis()/1000);
+      Serial.println(i);
       prevTime = millis()/1000;
+      i += 5;
     }
   }
+
   
 
 
